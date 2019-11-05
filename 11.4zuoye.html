@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+
+    <script>
+    //     // 1
+    // var a =00123;
+    // a = parseInt(a);
+    // a = a.toString()
+    // console.log(a.length)
+    // // 2
+    // var str = a.split("")
+    // console.log(str)
+
+    // 3, 判断一个三位整数是否是水仙花数
+    
+    // var num = prompt("请输入一个三位整数")
+    // // var num = 153;
+    // var a = num%100%10;
+    // var b = Math.floor(num%100/10);
+    // var c = Math.floor(num/100)
+    // console.log(a)
+    // console.log(b)
+    // console.log(c)
+    if(Math.pow(a,3)+Math.pow(b,3)+Math.pow(c,3)==num){
+        console.log(num+"是水仙花数")
+    }
+
+    // 4, 输入一个车牌号,判断这个车牌今天在郑州是否限号
+    // 号牌最后一位阿拉伯数字为1和6的机动车周一限行、2和7的周二限行、3和8的周三限行、4和9的周四限行、5和0的周五限行
+
+    // var box = prompt("请输入你的车牌号");
+    var box = "3aXb0x";
+    var numArr = box.split("");
+    var week = new Date().getDay();
+    // var str = "今天周"+week; 
+    console.log(week)
+    for(let i = numArr.length-1;i>=0;i--){
+        console.log(numArr[i])
+        var num = parseInt(numArr[i]);
+        // console.log(num)
+        if(!isNaN(num)){
+            function restrict(a){
+                if(a==6||a==0){
+                    alert("不限行")
+                }
+                // 一
+                // if(a==1){
+                //     if(num==1||num==6){
+                //         alert("今天周一限行")
+                //     }
+                //     else{
+                //         alert("不限行")
+                //     }
+                // }
+                // // 二
+                // if(a==2){
+                //     if(num==2||num==7){
+                //         alert("今天周二限行")
+                //     }
+                //     else{
+                //         alert("不限行")
+                //     }
+                // }
+                // // 三
+                // if(a==3){
+                //     if(num==3||num==8){
+                //         alert("今天周三限行")
+                //     }
+                //     else{
+                //         alert("不限行")
+                //     }
+                // }
+                // // 四
+                // if(a==4){
+                //     if(num==4||num==9){
+                //         alert("今天周四限行")
+                //     }
+                //     else{
+                //         alert("不限行")
+                //     }
+                // }
+                // // 五
+                // if(a==5){
+                //     if(num==5||num==0){
+                //         alert("今天周五限行")
+                //     }
+                //     else{
+                //         alert("不限行")
+                //     }
+                // }
+
+                if(a==num||a+5==num%10){
+                        alert("今天周"+a+"限行")
+                }
+                    else{
+                        alert("不限行")
+                    }
+            }
+            
+            restrict(week)
+            break;
+        }
+        
+    }
+
+    </script>
+</body>
+</html>
