@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>拼图</title>
+    <style>
+        section{
+            width: 300px; height: 300px;
+            border: 1px solid;
+            margin: 100px auto;
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        div{
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <button>开始游戏</button>
+    <section>  </section>
+</body>
+<script src="jquery.js"></script>
+<script>
+    // 1, 创建9个div表示9个地图板块
+    for(var i = 0; i < 9; i++){
+        $("<div></div>")
+        .appendTo("section")
+        .css({
+            width : "100px",
+            height: "100px",
+            backgroundImage: "url(拼图游戏.png)",
+            backgroundPosition: (-i % 3 * 100) + "px " + (-parseInt(i / 3) * 100) + "px" 
+            //九张背景图横坐标 0  -100  -200  0  -100  -200  0  -100  -200
+            //九张背景图纵坐标 0  0  0  -100 -100 -100  -200  -200  -200
+            //  i 的值是   0  1  2  3  4  5  6  7  8  
+        })
+    }
+    var randomArray
+    // 2, 点击开始游戏按钮, 打乱顺序 , 原理上使用弹性布局项目order属性排列顺序
+    $("button").click(function(){
+        // 定义排列顺序数组, 数组中放的是每一个div的order值, order值越大,排列越靠后,
+        // orderArray 中是开始游戏之前,每一个div的默认排列顺序
+        var orderArray = [0,1,2,3,4,5,6,7,8];
+        // randomArray 表示开始游戏时打款顺序之后的随机数组
+        randomArray = [];
+        // 遍历源数组orderArray,随机从源数组中取出一个数据,放入新数组
+        for(var i = 0; i < 9; i++){
+            // 从源数组中获取一个随即索引
+            var random = Math.floor(Math.random() * orderArray.length);
+            // 用随机索引从源数组中把order值取出,并从源数组删除
+            var order = orderArray.splice(random, 1)
+            // splice()的返回值是数组,从数组中把得到的order值放入新数组
+            randomArray.push(order[0]);
+        }
+        console.log(orderArray);
+        console.log(randomArray);
+        // 用打乱顺序之后的order数组重新排列,每一个div的顺序
+        $("div").each(function(index, item){
+            item.style.order = randomArray[index];
+        })
+    })
+
+    // 3, 鼠标点击拖动每一个div板块
+    var mouseX,  mouseY ; // 记录鼠标按下时在网页上的坐标
+    var currentDiv;   // 记录当前拖动的div
+    var divX, divY;    // 记录鼠标按下时div在网页上的坐标
+    var draging = false; //  记录当前是否正在拖拽 
+    // 鼠标按下时,记录鼠标坐标
+    $("div").mousedown(function(event){
+        draging = true;
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+        // 记录当前拖动的div
+        currentDiv = this;
+        // 提高拖拽这个div的层级,避免被其他div覆盖
+        currentDiv.style.zIndex = 1;
+        // 记录div坐标
+        divX = this.offsetLeft;
+        divY = this.offsetTop;
+    })
+    // 鼠标移动时,让div跟随鼠标移动
+    $("body").mousemove(function(event){
+        if(!draging)  return;  
+        // 计算鼠标的位移
+        var offsetX = event.pageX - mouseX;
+        var offsetY = event.pageY - mouseY;
+        // 根据鼠标的位移=div的位置, 设置div的位置
+        // console.log(offsetX)
+        $(currentDiv).css({
+            transform: "translate("+ offsetX + "px," + offsetY +"px)"
+        })
+    })
+    // 鼠标抬起时, div位置还原
+    window.onmouseup = function(event){ 
+        if(!draging) return;
+        draging = false;// 拖拽结束
+        currentDiv.style.zIndex = 0; // 还原层级
+        $(currentDiv).css({
+            transform: "translate(0, 0)"
+        })
+
+        // 4, 判断此时鼠标拖拽的位置是否在另一个div上方,如果是,交换这两个div的order值
+        // 我们通过鼠标此时相对于section左上角的坐标可以判定鼠标此时所在哪一个div上方  
+        // layerLeft和laterTop表示鼠标相对于section左上角的坐标
+        var layerLeft = event.pageX - $("section").offset().left;
+        var layerTop = event.pageY - $("section").offset().top;
+        // 通过鼠标相对坐标计算鼠标所在的div索引
+        // 通过鼠标的横坐标得到当前鼠标所在的列数[0,2]
+        var col = Math.floor(layerLeft / 100) 
+        // 通过鼠标的横坐标得到当前鼠标所在的行数[0,2]
+        var row = Math.floor(layerTop / 100)
+        // 如果行数和列数不在[0,2]范围内,说明此时鼠标在section之外, 不再交换位置
+        if(row > 2 || row < 0 || col > 2 || col < 0){
+            return;
+        }
+        // 通过行数和列数计算鼠标所在的div的order值(索引)[0, 8]
+        var index = row * 3 + col;
+        console.log(row + "-" + col + "-" + index)
+
+        // 当前拖拽的div是currentDiv, 拖拽结束后,鼠标所在的div是coverDiv
+        var coverDiv;
+        $("div").each(function(i, item){
+            // $("div") 表示打乱顺序之前的div创建的顺序
+            // 打乱顺序之后, div按照order的顺序排列, 所以order的顺序和索引index对象
+            if(item.style.order == index){
+                coverDiv = item;
+            }
+        }) 
+        // 交换这两个div的order值即可交换位置
+        var temp = currentDiv.style.order;
+        currentDiv.style.order = coverDiv.style.order;
+        coverDiv.style.order = temp;
+
+        // 结束方法一:
+        // var over = true;
+        // // 判断拼图是否结束
+        // $("div").each(function(i, item){
+        //     // i 表示div的创建顺序索引,  order是排列后的顺序值
+        //     if(item.style.order != i){
+        //         over = false;
+        //     }
+        // })
+        // if(over){
+        //     alert("拼图完成")
+        // }
+
+        // 结束方法二:
+        var result = $("div").toArray().every(function(item, i){
+            return item.style.order == i
+        })
+        if(result){   
+            alert("拼图完成")
+        }    
+    }
+</script>
+</html>
